@@ -1,0 +1,21 @@
+name: 'Library Documentation action'
+description: 'Generates documentation for Pony libraries'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+inputs:
+  library_name:
+    description: 'Name of the library being uploaded'
+    required: true
+  docs_build_dir:
+    description: 'Location, relative to the Makefile, that generated documentation will be placed'
+    required: true
+  site_url:
+    description: 'Url for the site that the documentation will be hosted on'
+    required: true
+  git_user_name:
+    description: 'Name to associate with documentation commits'
+    required: true
+  git_user_email:
+    description: 'Email to associate with documentation commits'
+    required: true
