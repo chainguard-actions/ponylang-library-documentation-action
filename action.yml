@@ -1,0 +1,22 @@
+description: Generates documentation for Pony libraries
+inputs:
+  docs_build_dir:
+    description: Location, relative to the Makefile, that generated documentation
+      will be placed
+    required: true
+  git_user_email:
+    description: Email to associate with documentation commits
+    required: true
+  git_user_name:
+    description: Name to associate with documentation commits
+    required: true
+  library_name:
+    description: Name of the library being uploaded
+    required: true
+  site_url:
+    description: Url for the site that the documentation will be hosted on
+    required: true
+name: Library Documentation action
+runs:
+  image: docker://ponylang/library-documentation-action@sha256:5bc85c22f9fbc1b48d640a1dcfe815be3fa1a1f6dc136a03b3ae2d43e868f67b # 0.5.0
+  using: docker

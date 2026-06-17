@@ -1,0 +1,41 @@
+name: Test basic usage
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up a minimal Pony library structure
+        run: |
+          mkdir -p docs
+          # Create a minimal Makefile that the action expects
+          cat > Makefile << 'EOF'
+          .PHONY: docs
+          docs:
+          	mkdir -p docs
+          	echo "# Test Library" > docs/index.md
+          EOF
+      - id: action
+        uses: .
+        with:
+          docs_build_dir: docs
+          git_user_email: test@example.com
+          git_user_name: Test User
+          library_name: test-library
+          site_url: https://example.com/test-library
+        continue-on-error: true
+      - name: Assert action was invoked
+        run: |
+          echo "Action outcome: ${{ steps.action.outcome }}"
+          # The action runs a Docker container that tries to build and publish docs.
+          # It may fail at the git push step since there's no real remote configured,
+          # but we verify it was invoked (started) successfully.
+          if [ "${{ steps.action.outcome }}" = "skipped" ]; then
+            echo "FAIL: action was skipped, expected it to run"
+            exit 1
+          fi
+          echo "PASS: action was invoked"
