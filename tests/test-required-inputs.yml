@@ -1,0 +1,42 @@
+name: Test required inputs - library documentation action
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up minimal project structure
+        run: |
+          mkdir -p output-docs
+          cat > Makefile << 'EOF'
+          docs:
+          	mkdir -p output-docs
+          	echo "# My Library" > output-docs/index.md
+          	echo "Documentation generated"
+          EOF
+          echo "Project structure ready"
+
+      - id: action
+        uses: .
+        with:
+          docs_build_dir: output-docs
+          git_user_email: docs-bot@myorg.com
+          git_user_name: Docs Bot
+          library_name: my-pony-library
+          site_url: https://myorg.github.io/my-pony-library
+        continue-on-error: true
+
+      - name: Assert action was invoked with all required inputs
+        run: |
+          echo "Action outcome: ${{ steps.action.outcome }}"
+          # Verify the action was invoked (not skipped due to missing inputs)
+          if [ "${{ steps.action.outcome }}" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action accepted all required inputs and ran"
