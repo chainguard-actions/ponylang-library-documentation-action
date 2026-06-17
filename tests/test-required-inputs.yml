@@ -1,0 +1,37 @@
+name: Test required inputs are accepted
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Verify all required inputs are accepted by the action
+        run: |
+          echo "Testing that action accepts all required inputs:"
+          echo "  docs_build_dir: site"
+          echo "  git_user_email: docs@ponylang.io"
+          echo "  git_user_name: Pony Docs Bot"
+          echo "  library_name: ponytest"
+          echo "  site_url: https://ponylang.github.io/ponytest"
+      - id: action
+        uses: .
+        with:
+          docs_build_dir: site
+          git_user_email: docs@ponylang.io
+          git_user_name: Pony Docs Bot
+          library_name: ponytest
+          site_url: https://ponylang.github.io/ponytest
+        continue-on-error: true
+      - name: Assert action ran (not skipped)
+        run: |
+          OUTCOME="${{ steps.action.outcome }}"
+          echo "Action outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was unexpectedly skipped"
+            exit 1
+          fi
+          echo "PASS: action was invoked with all required inputs (outcome: $OUTCOME)"

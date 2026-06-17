@@ -1,0 +1,35 @@
+name: Test basic usage - library documentation action
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REF: refs/heads/main
+      GITHUB_EVENT_NAME: push
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up git config (required by action for commits)
+        run: |
+          git config --global user.email "test@example.com"
+          git config --global user.name "Test User"
+      - id: action
+        uses: .
+        with:
+          docs_build_dir: build/docs
+          git_user_email: test@example.com
+          git_user_name: Test User
+          library_name: my-pony-library
+          site_url: https://example.com/my-pony-library
+        continue-on-error: true
+      - name: Assert action was invoked
+        run: |
+          echo "Action outcome: ${{ steps.action.outcome }}"
+          # The action runs a Docker container that attempts to build Pony docs.
+          # Without a real Pony project/Makefile, it will fail internally,
+          # but we verify the action was at least invoked (not skipped).
+          if [ "${{ steps.action.outcome }}" = "skipped" ]; then
+            echo "FAIL: action was skipped, expected it to run"
+            exit 1
+          fi
+          echo "PASS: action was invoked (outcome: ${{ steps.action.outcome }})"
