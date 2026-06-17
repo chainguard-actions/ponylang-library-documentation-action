@@ -8,6 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
+| 0.1.6 | [`0.1.6`](https://github.com/chainguard-actions/ponylang-library-documentation-action/tree/0.1.6) | [`5432556`](https://github.com/ponylang/library-documentation-action/commit/5432556026642dfaff760da7c08edab93ecf6398) |
 | 0.5.0 | [`0.5.0`](https://github.com/chainguard-actions/ponylang-library-documentation-action/tree/0.5.0) | [`0e9460a`](https://github.com/ponylang/library-documentation-action/commit/0e9460a5ac018114c4a1d0ee18dc96ba81f3e64a) |
 
 ## Privacy
