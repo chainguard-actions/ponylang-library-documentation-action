@@ -18,5 +18,5 @@ inputs:
     required: true
 name: Library Documentation action
 runs:
-  image: docker://ponylang/library-documentation-action@sha256:104460f90891b77056ec32145434935f09899736ad07ab3262c375ecb28b2107 # 0.2.0
+  image: docker://ponylang/library-documentation-action:0.2.0@sha256:104460f90891b77056ec32145434935f09899736ad07ab3262c375ecb28b2107
   using: docker
