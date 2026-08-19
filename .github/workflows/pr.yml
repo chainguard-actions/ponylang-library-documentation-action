@@ -1,0 +1,47 @@
+name: PR
+
+on: pull_request
+
+permissions: {}
+
+jobs:
+  lint-entrypoint-py:
+    name: Lint entrypoint.py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@50fbc622fc4ef5163becd7fab6573eac35f8462e # v1
+      - name: pylint
+        run: make pylint
+
+  superlinter:
+    name: Lint bash, docker, markdown, and yaml
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
+      - name: Lint codebase
+        uses: docker://github/super-linter:v3.8.3@sha256:11ec9aa31cdcb296de042942b18bb2c1a00495775657eb3b68c271f79ba1e86c
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_BASH: true
+          VALIDATE_DOCKERFILE: true
+          VALIDATE_MD: true
+          VALIDATE_YAML: true
+
+  validate-docker-image-builds:
+    name: Validate Docker image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@50fbc622fc4ef5163becd7fab6573eac35f8462e # v1
+      - name: Docker build
+        run: make build
+
+  verify-changelog:
+    name: Verify CHANGELOG is valid
+    runs-on: ubuntu-latest
+    container:
+      image: ponylang/changelog-tool:release
+    steps:
+      - uses: actions/checkout@50fbc622fc4ef5163becd7fab6573eac35f8462e # v1
+      - name: Verify CHANGELOG
+        run: changelog-tool verify

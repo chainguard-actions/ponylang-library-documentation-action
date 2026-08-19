@@ -1,0 +1,23 @@
+name: Start a release
+
+on:
+  push:
+    tags:
+      - release-\d+.\d+.\d+
+
+permissions: {}
+
+jobs:
+  start-a-release:
+    name: Start a release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@50fbc622fc4ef5163becd7fab6573eac35f8462e # v1
+      - name: Start
+        uses: ponylang/release-bot-action@34efa6656c60a3075ef39a9861ee105a5d8ac42f # 0.5.0
+        with:
+          step: start-a-release
+          git_user_name: "Ponylang Main Bot"
+          git_user_email: "ponylang.main@gmail.com"
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
