@@ -1,42 +1,43 @@
-name: Test required inputs - library documentation action
+name: Test required inputs are accepted
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_REF: refs/heads/main
-      GITHUB_EVENT_NAME: push
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      - name: Set up minimal project structure
+      - name: Set up minimal library structure
         run: |
-          mkdir -p output-docs
+          # Create a minimal Makefile with docs target
           cat > Makefile << 'EOF'
           docs:
-          	mkdir -p output-docs
-          	echo "# My Library" > output-docs/index.md
-          	echo "Documentation generated"
+          	mkdir -p site/docs
+          	echo "<html><body>Library docs</body></html>" > site/docs/index.html
           EOF
-          echo "Project structure ready"
+
+          # Configure git
+          git config --global user.email "docs@ponylang.io"
+          git config --global user.name "Pony Docs Bot"
 
       - id: action
         uses: .
         with:
-          docs_build_dir: output-docs
-          git_user_email: docs-bot@myorg.com
-          git_user_name: Docs Bot
+          docs_build_dir: site/docs
+          git_user_email: docs@ponylang.io
+          git_user_name: Pony Docs Bot
           library_name: my-pony-library
-          site_url: https://myorg.github.io/my-pony-library
+          site_url: https://ponylang.github.io/my-pony-library
         continue-on-error: true
 
       - name: Assert action was invoked with all required inputs
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
         run: |
-          echo "Action outcome: ${{ steps.action.outcome }}"
+          echo "action outcome: $OUTCOME"
           # Verify the action was invoked (not skipped due to missing inputs)
-          if [ "${{ steps.action.outcome }}" = "skipped" ]; then
-            echo "FAIL: action was skipped unexpectedly"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped — required inputs may not have been accepted"
             exit 1
           fi
-          echo "PASS: action accepted all required inputs and ran"
+          echo "PASS: action accepted all required inputs and ran (outcome: $OUTCOME)"

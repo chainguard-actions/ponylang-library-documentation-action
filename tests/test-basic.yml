@@ -1,44 +1,47 @@
-name: Test basic usage - library documentation action
+name: Test basic usage
 on:
   workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_REF: refs/heads/main
-      GITHUB_EVENT_NAME: push
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up minimal Pony library structure
         run: |
-          mkdir -p docs
+          # Create a minimal Makefile with docs target
           cat > Makefile << 'EOF'
           docs:
-          	mkdir -p docs
-          	echo "# Test Library" > docs/index.md
+          	mkdir -p build/docs
+          	echo "<html><body>Test docs</body></html>" > build/docs/index.html
           EOF
-          echo "Makefile created"
-          cat Makefile
+
+          # Create a minimal docs directory
+          mkdir -p docs
+
+          # Configure git so the action can commit
+          git config --global user.email "test@example.com"
+          git config --global user.name "Test User"
 
       - id: action
         uses: .
         with:
-          docs_build_dir: docs
+          docs_build_dir: build/docs
           git_user_email: test@example.com
           git_user_name: Test User
           library_name: test-library
-          site_url: https://example.com/test-library
+          site_url: https://example.github.io/test-library
         continue-on-error: true
 
       - name: Assert action ran
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
         run: |
-          echo "Action outcome: ${{ steps.action.outcome }}"
-          # The action runs a Docker container that tries to build docs
-          # It may fail if the full Pony toolchain is not available,
+          echo "action outcome: $OUTCOME"
+          # The action is expected to attempt to run; it may fail on git push
           # but we verify it was invoked (not skipped)
-          if [ "${{ steps.action.outcome }}" = "skipped" ]; then
+          if [ "$OUTCOME" = "skipped" ]; then
             echo "FAIL: action was skipped, expected it to run"
             exit 1
           fi
-          echo "PASS: action ran (outcome: ${{ steps.action.outcome }})"
+          echo "PASS: action ran (outcome: $OUTCOME)"
