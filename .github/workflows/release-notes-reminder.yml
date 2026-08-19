@@ -1,0 +1,19 @@
+name: Release Notes Reminder
+
+on:
+  pull_request_target:
+    types:
+      - labeled
+
+permissions:
+  contents: read
+
+jobs:
+  release-note-reminder:
+    runs-on: ubuntu-latest
+    name: Prompt to add release notes
+    steps:
+      - name: Prompt to add release notes
+        uses: docker://ponylang/release-notes-reminder-bot-action:0.1.0@sha256:d440f086626e5cfc515e7bac2864045e6f51fbc359cf6e08c361d695fa034988
+        env:
+          API_CREDENTIALS: ${{ secrets.PONYLANG_MAIN_API_TOKEN }}

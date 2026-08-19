@@ -1,0 +1,26 @@
+name: Changelog Bot
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+    paths-ignore:
+      - CHANGELOG.md
+
+permissions:
+  contents: read
+
+jobs:
+  changelog-bot:
+    runs-on: ubuntu-latest
+    name: Update CHANGELOG.md
+    steps:
+      - name: Update Changelog
+        uses: docker://ponylang/changelog-bot-action:0.3.3@sha256:b1ec819f2161bf5e43a0d5d8657279fe24a181c8ce080c856988f39d77dc260e
+        with:
+          git_user_name: "Ponylang Main Bot"
+          git_user_email: "ponylang.main@gmail.com"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
